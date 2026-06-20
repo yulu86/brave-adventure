@@ -40,12 +40,19 @@ mono_crash.*.json
 export_presets.cfg
 build/
 
+# AI AGENT config
 .zcode/
 .opencode/
 opencode.json
+AGENTS.md
 
+# env
 .env
 
+# reports
+reports/report*
+
+# others
 tmp/
 **/superpowers/
 test/**/*.png

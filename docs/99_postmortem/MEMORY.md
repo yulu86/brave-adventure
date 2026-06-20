@@ -18,6 +18,21 @@
 - **规则**：以后怎么做
 -->
 
+- **场景**：开发 M1（主角水平移动，2026-06-20）
+- **教训**：
+  - **Godot 碰撞层是位掩码，不是层号本身**：`collision_layer`/`collision_mask` 是 32 位位掩码，第 N 层（UI 显示 layer 1~32）对应 bit(N-1)，即值 `2^(N-1)`。我误把"可碰撞地形(layer_6)"写成 64（实际是 layer_7 触发区的值），正确应为 `2^5=32`。AI 配置碰撞层是自身职责，不能想当然
+  - **headless SceneTree 脚本模式不生成 .uid 文件**：用 `extends SceneTree` + `--script` 运行的配置脚本不走 EditorFileSystem，反复 `ResourceSaver.save` 不会生成 Godot 4 的 `.uid` 映射文件。若 `.tscn` 内部声明了 `uid="uid://xxx"` 但无对应 `.uid` 文件，加载时会报 `invalid UID` 警告并 fallback 到 text path。解决办法：resave 时让 Godot 移除内部 uid 声明（首次 save 无 uid，后续编辑器打开会自动补全并生成 .uid）
+  - **"加载场景→add_child→保存"脚本会累积重复节点**：用 `packed.instantiate()` 加载已有场景再 `add_child`，每次跑都会在原有节点基础上追加，导致 `@StaticBody2D@2` 这类自动命名重复节点。正确做法：配置脚本应**从零构建**（`Node2D.new()` 全新实例），不要加载已有场景做增量修改
+  - **ColorRect 是 Control 节点，用 offset_* 而非 size/position**：占位方块用 ColorRect 时，尺寸通过 `offset_left/top/right/bottom` 定义，且需 `set_anchor(四边, 0)` 防止被父节点尺寸拉伸；直接设 `size`/`position` 不生效
+  - **GdUnit4 API 版本差异**：本版 GdUnit4 无 `add_child_autoqfree()`，自动清理用 `auto_free(obj)`；新版 runner 路径从 `addons/gdUnit4/src/runner/GdUnitRunnerCmd.gd` 变为 `addons/gdUnit4/bin/GdUnitCmdTool.gd`；headless 跑测试需加 `--ignoreHeadlessMode`
+  - **纯逻辑函数抽离提升可测性**：将 `compute_horizontal_velocity` 抽成纯函数（不依赖 Input/场景树），单测可直接传参验证加速度/摩擦力模型，绕开 headless 下 Input 事件不可注入的问题
+- **规则**：
+  - 以后配 Godot 碰撞层：layer N → 值 `2^(N-1)`，必须换算确认；layer(自己是什么)与 mask(检测谁)分开配；在文档/代码注释里标注"layer_6=可碰撞地形=bit5=值32"
+  - 以后用脚本批量生成/配置场景：**从零构建**（`Xxx.new()`），禁用"加载已有场景增量改"；配置完跑一次 `godot_validate_scenes` 确认无重复/断裂
+  - 以后 headless 配置 `.tscn`/`.tres`：接受首次无 .uid 文件（编辑器打开会自动补），不要为了消除 uid 警告反复 save
+  - 以后写 GdUnit4 测试：自动清理一律用 `auto_free()`，不假设 `add_child_autoqfree` 存在；headless 命令固定用 `bin/GdUnitCmdTool.gd ... --ignoreHeadlessMode`
+  - 以后做手感/移动逻辑：把核心计算抽成纯函数单测，避免依赖 Input/物理引擎的集成测试（headless 难注入）
+
 - **场景**：分析项目游戏资产生成资产说明文档（2026-06-20）
 - **教训**：
   - 精灵表帧数可通过 `sips -g pixelWidth -g pixelHeight` 取尺寸后，结合"单行布局 + 已知帧高"精确计算 `hframes`（帧数 = 宽 ÷ 帧宽），无需依赖 AI 视觉识别猜测
@@ -41,3 +56,7 @@
 - **主角动画缺口**：无独立受击(Hurt)动画，只有 Dead；接入状态机时受击态需临时代替
 - **TileSet 现状**：cave.tres(Tiles→草地)、background/foreground/geometry.tres(Tree-Assets→树冠/树梢/树干分层)，建筑/蜂巢/室内/岩石道具尚未配 TileSet
 - **字体**：主题引用 SmileySans-Oblique.otf(中文)，另有未引用的同名 .ttf(冗余2.5M)；PixelOperator8 为像素英文
+- **GdUnit4 测试命令**：headless 跑测试用 `"$GODOT_HOME/godot" --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd -a test/{目录} --ignoreHeadlessMode`（非宪法附录 A 的旧 runner 路径，且需 `--ignoreHeadlessMode`）；测试清理用 `auto_free()` 无 `add_child_autoqfree`
+- **碰撞层位掩码速查**：layer_1玩家=1, layer_2敌人=2, layer_3玩家攻击区=4, layer_4敌人攻击区=8, layer_5受击区=16, layer_6可碰撞地形=32, layer_7触发区=64（值=2^(层号-1)）
+- **物理层配置**：玩家 layer=玩家(1) mask=可碰撞地形(32)；敌人 layer=敌人(2) mask=可碰撞地形(32)；地面 layer=可碰撞地形(32) mask=0
+- **场景生成方式**：用 `extends SceneTree` + `--script` 的配置脚本 + `ResourceSaver.save` 从零构建 .tscn/.tres（非手写文本，符合宪法 §12.1）；首次无 .uid 文件属正常，编辑器打开自动补

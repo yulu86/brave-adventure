@@ -2,11 +2,11 @@
 
 [ext_resource type="Script" uid="uid://buptsw0v5wvky" path="res://scripts/player/player.gd" id="1_qhqgy"]
 [ext_resource type="Resource" path="res://assets/resources/stats/player_stats.tres" id="2_dqkch"]
-[ext_resource type="SpriteFrames" uid="uid://dw5n7ghhmop4h" path="res://assets/resources/animation/player_spriteframes.tres" id="3_qlg0r"]
+[ext_resource type="SpriteFrames" uid="uid://c22248adxwcpv" path="res://assets/resources/animation/player_spriteframes.tres" id="3_qlg0r"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qhqgy"]
 radius = 8.0
-height = 48.0
+height = 32.0
 
 [node name="Player" type="CharacterBody2D" unique_id=838037825]
 collision_mask = 32
@@ -14,13 +14,14 @@ script = ExtResource("1_qhqgy")
 stats = ExtResource("2_dqkch")
 
 [node name="BodySprite" type="AnimatedSprite2D" parent="." unique_id=1168109315]
-position = Vector2(0, 16)
+position = Vector2(0, 12)
 sprite_frames = ExtResource("3_qlg0r")
-animation = &"idle"
+animation = &"jump"
 autoplay = "idle"
-frame_progress = 0.4148726
+frame = 7
+frame_progress = 1.0
 offset = Vector2(0, -40)
 
 [node name="BodyShape" type="CollisionShape2D" parent="." unique_id=1797449691]
-position = Vector2(0, -24)
+position = Vector2(0, -16)
 shape = SubResource("CapsuleShape2D_qhqgy")

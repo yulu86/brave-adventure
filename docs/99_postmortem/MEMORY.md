@@ -60,9 +60,25 @@
   - 以后加新 Input Action：直接 Edit `project.godot [input]` 文本（非场景文件，§12.1 不约束），改完提醒用户重载项目
   - 以后写变速跳跃：固定用 `is_action_just_released + velocity.y < 0` 裁剪上升速度方案，简洁且足够
 
+- **场景**：开发 M3/M4（主角 idle/run/jump 动画，2026-06-20）
+- **教训**：
+  - **AnimatedSprite2D 的 offset 是节点级单一值，无 per-animation offset**：当不同动画帧高不一致（如 idle/run 高 80px、jump 高 64px）时，固定 offset 无法同时脚底对齐。解决方案：在代码切动画时**动态设 offset**（`_apply_offset(anim)`），按帧高算 `offset.y = -frame_h/2` 使脚底恒贴碰撞框脚底（架构 §14.2 帧尺寸对齐风险）
+  - **SpriteFrames 切帧用 AtlasTexture + add_frame 而非 hframes**：`AnimatedSprite2D` 本身无 hframes 属性（那是 Sprite2D/Sprite3D 的）。SpriteFrames 要从精灵表切帧，需为每帧创建 `AtlasTexture`（设 `atlas`=源纹理 + `region`=Rect2 切片），用 `frames.add_frame(anim_name, atlas)` 逐帧添加。切片 region 用 `Rect2i(i*frame_w, 0, frame_w, frame_h)` 横向切（单行表）
+  - **非循环动画每帧重复调 play 会被重置重播**：`_physics_process` 里每帧调 `body_sprite.play("jump")`，即使 loop=false 也会反复从头播放（用户验证发现"jump 在空中播放多次"）。修复：仅在动画名变化时调 play（`if body_sprite.animation != anim: play(anim)`），落地后 is_on_floor() 转 true 自然触发切回 idle
+  - **@onready 引用使旧测试夹具失效**：M3 起 player.gd 加了 `@onready body_sprite = $BodySprite`，M1/M2 用 `Player.new()` 纯代码创建的测试夹具会因无 BodySprite 子节点在 `_ready` 报 "Node not found"。修复：测试夹具统一改为 `load("res://scenes/player.tscn").instantiate()` 实例化真实场景（遵 §4.2 场景可复用可实例化）
+  - **SpriteFrames.take_over_path 让场景引用独立 .tres**：`ResourceSaver.save(frames, path)` 后默认会被场景内联为 SubResource（重复存储）。在 save 前调 `frames.take_over_path(path)` 设资源路径，pack 场景时即引用外部 .tres 而非内联
+  - **配置脚本生成的 SpriteFrames 首次带 default 空动画**：`SpriteFrames.new()` 自带一个空的 `default` 动画（frames=[], speed=5），生成时需 `if has_animation(&"default"): remove_animation(&"default")` 清理
+  - **Godot API 用 ClassDB 脚本现场查最准**：Context7/MCP 文档缓存常不全（SpriteFrames/AtlasTexture 不在 godot-ultimate 缓存）。写个 `extends SceneTree` 临时脚本用 `ClassDB.class_get_method_list("ClassName")` / `class_get_property_list("ClassName")` 直接查引擎实例，比查文档可靠
+- **规则**：
+  - 以后做帧高不一致的多动画（如跳跃 vs 移动）：用代码动态切 offset 脚底对齐，不指望 AnimatedSprite2D 有 per-animation offset
+  - 以后用 SpriteFrames 从精灵表切帧：每帧建 AtlasTexture（atlas+region）+ add_frame，不要找不存在的 hframes
+  - 以后播非循环动画：只在动画名变化时调 play，禁每帧重复调（防重置重播）
+  - 以后被测类有 @onready 节点引用：测试夹具用场景实例化，不用纯 new()
+  - 以后查 Godot API：优先用 ClassDB SceneTree 脚本现场查，比文档/MCP 可靠
+
 ## 项目专属经验（brave-adventure）
 
-- **技术栈**：Godot 4.6 + Forward Plus + Jolt Physics + GdUnit4；视口 480×270，窗口 1920×1080，stretch=viewport
+- **技术栈**：Godot 4.6 + Forward Plus + Jolt Physics + GdUnit4；视口 320×180，窗口 2560×1440（8×缩放），stretch=viewport（**M4 用户精调由 480×270 收窄至 320×180**）
 - **核心美术包**：`Legacy-Fantasy_High_Forest_2.3/`（itch.io 免费），提供主角7动作/3怪物/地形/道具/背景/HUD 全套
 - **怪物清单**：野猪(Boar,32px,地面冲撞)/蜗牛(Snail,32px,防御缩壳)/蜜蜂(Small Bee,64px,飞行) —— 注意无兽人(Orc)，但音效包有 orc 系列，可复用
 - **主角动画缺口**：无独立受击(Hurt)动画，只有 Dead；接入状态机时受击态需临时代替
@@ -73,3 +89,6 @@
 - **物理层配置**：玩家 layer=玩家(1) mask=可碰撞地形(32)；敌人 layer=敌人(2) mask=可碰撞地形(32)；地面 layer=可碰撞地形(32) mask=0
 - **场景生成方式**：用 `extends SceneTree` + `--script` 的配置脚本 + `ResourceSaver.save` 从零构建 .tscn/.tres（非手写文本，符合宪法 §12.1）；首次无 .uid 文件属正常，编辑器打开自动补
 - **Story 收尾必做：刷新进度索引**：每个 Story 完成并通过玩家手工验证（§12.5）后，**必须**刷新 `docs/07_story/01_MVP/README.md` 中该 Story 的状态列（`⬜ 待开发` → `✅ 已完成`）+ 更新对应 Story 文档头部的「状态」字段；该动作纳入 §12.6 收尾闭环，与经验沉淀同一 docs commit 提交
+- **主角 SpriteFrames**：`assets/resources/animation/player_spriteframes.tres`，含 idle(4帧/fps8/loop)/run(10帧/fps12/loop)/jump(15帧/fps15/非循环)；帧高差异 idle+run=80、jump=64，靠 player.gd `_apply_offset` 动态切 offset（idle+run→-40，jump→-32）。源素材在 `assets/sprites/Legacy-Fantasy_High_Forest_2.3/Character/{Idle,Run,Jumlp-All}/`（注意 Jumlp 源包拼写错误）
+- **视口分辨率已收窄**：M4 用户精调将视口 480×270 → 320×180、窗口 1920×1080 → 2560×1440（8× 缩放）。架构文档/GDD/美术清单已同步刷新（关卡物理宽度 2400px 不变，屏数由 5 屏变 7.5 屏）。瓦片网格 16×16 不变，一行由 30 格变 20 格
+- **配置脚本目录**：`scripts/tools/setup_player_m{3,4}.gd`（extends SceneTree），已纳入 git（.gitignore 无 tools/ 忽略），用 `godot --headless --path . --script res://scripts/tools/xxx.gd` 运行。后续角色/资源生成脚本放此处

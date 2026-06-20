@@ -1,7 +1,7 @@
 # Godot 游戏开发宪法（项目级）
 
 > 本文件是 **Godot 4.x / GDScript 专属**宪法，所有条款为最高优先级指令，不可协商、不可绕过。
-> 用户指令优先级高于 Skill；与全局通用宪法（`~/.zcode/AGENTS.md`）互补，通用条款（语言、工具使用、ComfyUI、飞书、Git 规范等）不在此重复，遵从全局约定。
+> 用户指令优先级高于 Skill；与全局通用宪法互补，通用条款（语言、工具使用、ComfyUI、飞书、Git 规范等）不在此重复，遵从全局约定。
 
 ---
 
@@ -9,11 +9,11 @@
 
 ### 0.1 适用工具
 
-本项目 `AGENTS.md` 被 **Codex / OpenCode / Claude Code** 等主流 AI 编码工具默认读取。本文是这些工具在本 Godot 项目中协作的唯一行为基线。
+本项目 `AGENTS.md` 被 **Codex / OpenCode / Claude Code / ZCode** 等主流 AI 编码工具默认读取。本文是这些工具在本 Godot 项目中协作的唯一行为基线。
 
 ### 0.2 适用范围
 
-- **适用**：Godot 4.x + GDScript（本项目当前为 Godot 4.6、Forward Plus、Jolt Physics）。
+- **适用**：Godot 4.x + GDScript（本项目当前为 Godot 4.x、Forward Plus、Jolt Physics）。
 - **例外**：C#、GDExtension / C++、Visual Script、编辑器插件开发——不适用本文件，遇到时须先与用户确认方案，不擅自套用 GDScript 规则。
 
 ### 0.3 规则标签

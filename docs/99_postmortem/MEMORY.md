@@ -72,3 +72,4 @@
 - **碰撞层位掩码速查**：layer_1玩家=1, layer_2敌人=2, layer_3玩家攻击区=4, layer_4敌人攻击区=8, layer_5受击区=16, layer_6可碰撞地形=32, layer_7触发区=64（值=2^(层号-1)）
 - **物理层配置**：玩家 layer=玩家(1) mask=可碰撞地形(32)；敌人 layer=敌人(2) mask=可碰撞地形(32)；地面 layer=可碰撞地形(32) mask=0
 - **场景生成方式**：用 `extends SceneTree` + `--script` 的配置脚本 + `ResourceSaver.save` 从零构建 .tscn/.tres（非手写文本，符合宪法 §12.1）；首次无 .uid 文件属正常，编辑器打开自动补
+- **Story 收尾必做：刷新进度索引**：每个 Story 完成并通过玩家手工验证（§12.5）后，**必须**刷新 `docs/07_story/01_MVP/README.md` 中该 Story 的状态列（`⬜ 待开发` → `✅ 已完成`）+ 更新对应 Story 文档头部的「状态」字段；该动作纳入 §12.6 收尾闭环，与经验沉淀同一 docs commit 提交

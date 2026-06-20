@@ -7,11 +7,14 @@ extends GdUnitTestSuite
 
 # === 测试夹具 ===
 
-## 构造一个挂载默认 PlayerStats 的 Player 实例并加入场景树。
+## 实例化 player.tscn（含 BodySprite/BodyShape 完整节点树）并加入场景树。
+##
+## M3 起 player.gd 依赖 @onready body_sprite，纯 Player.new() 无该子节点会报错，
+## 故改为实例化场景（遵宪法 §4.2 场景可复用可实例化）。
 func _make_player() -> Player:
-	var stats: PlayerStats = PlayerStats.new()
-	var player: Player = Player.new()
-	player.stats = stats
+	var packed: PackedScene = load("res://scenes/player.tscn")
+	var player: Player = packed.instantiate()
+	player.stats = PlayerStats.new()
 	add_child(player)
 	# GdUnit4 自动清理：测试结束自动释放，避免泄漏。
 	auto_free(player)

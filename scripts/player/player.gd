@@ -1,7 +1,7 @@
 ## 主角控制脚本。
 ##
-## M2 阶段：M1 水平移动/重力下落基础上，增量加入跳跃（变速跳跃 + 空中可控 + 非地面不起跳）。
-## 跳跃判定散装在主脚本（架构 §4.3）；土狼时间/缓冲留 M6 统一接入。遵从宪法 §1.4 数据驱动：数值走 PlayerStats。
+## M3 阶段：M2 跳跃基础上，增量加入动画选择（移动选 run / 静止选 idle）与方向翻转。
+## 动画选择逻辑散装在主脚本（架构 §4.3）；M5 才迁入状态机。遵从宪法 §1.4 数据驱动：数值走 PlayerStats。
 class_name Player
 extends CharacterBody2D
 
@@ -10,7 +10,8 @@ extends CharacterBody2D
 @export var stats: PlayerStats
 
 # === Onready ===
-# （M1 占位阶段，无精灵/碰撞引用；场景骨架由 MCP 搭建后逐步接入）
+## 身体精灵（AnimatedSprite2D），脚底锚定 BodyShape 脚底（offset.y=-40，帧高 80）。
+@onready var body_sprite: AnimatedSprite2D = $BodySprite
 
 # === Lifecycle ===
 
@@ -27,6 +28,11 @@ func _physics_process(delta: float) -> void:
 	var input_dir: float = Input.get_axis(&"move_left", &"move_right")
 	velocity.x = compute_horizontal_velocity(velocity.x, input_dir, delta)
 	move_and_slide()
+	# 动画选择与方向翻转（M3）：水平速度近零视为静止。
+	var moving: bool = abs(velocity.x) > 1.0
+	body_sprite.play(pick_animation(moving))
+	if input_dir != 0.0:
+		body_sprite.flip_h = input_dir < 0.0
 
 # === Public Methods ===
 
@@ -53,3 +59,10 @@ func compute_horizontal_velocity(current_vx: float, input_dir: float, delta: flo
 		# 无输入：受摩擦力减速至 0。
 		current_vx = move_toward(current_vx, 0.0, stats.friction * delta)
 	return current_vx
+
+## 选择当前应播放的动画名（纯逻辑，可独立单元测试）。
+##
+## 移动中选 run 循环，静止选 idle 呼吸（M3-2/M3-3）。[br]
+## [param moving] 是否处于水平移动状态（abs(velocity.x) > 阈值）。
+func pick_animation(moving: bool) -> StringName:
+	return &"run" if moving else &"idle"

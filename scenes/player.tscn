@@ -1,23 +1,26 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://c8bvc720o7n8h"]
 
-[ext_resource type="Script" path="res://scripts/player/player.gd" id="1_g2els"]
-[ext_resource type="Resource" path="res://assets/resources/stats/player_stats.tres" id="2_qhqgy"]
+[ext_resource type="Script" uid="uid://buptsw0v5wvky" path="res://scripts/player/player.gd" id="1_qhqgy"]
+[ext_resource type="Resource" path="res://assets/resources/stats/player_stats.tres" id="2_dqkch"]
+[ext_resource type="SpriteFrames" uid="uid://dw5n7ghhmop4h" path="res://assets/resources/animation/player_spriteframes.tres" id="3_qlg0r"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_dqkch"]
-size = Vector2(32, 40)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qhqgy"]
+radius = 8.0
+height = 48.0
 
-[node name="Player" type="CharacterBody2D" unique_id=660545596]
+[node name="Player" type="CharacterBody2D" unique_id=838037825]
 collision_mask = 32
-script = ExtResource("1_g2els")
-stats = ExtResource("2_qhqgy")
+script = ExtResource("1_qhqgy")
+stats = ExtResource("2_dqkch")
 
-[node name="BodySprite" type="ColorRect" parent="." unique_id=1083344574]
-offset_left = -16.0
-offset_top = -40.0
-offset_right = 16.0
-color = Color(2.3102762e-06, 0.68186617, 0.61745065, 1)
+[node name="BodySprite" type="AnimatedSprite2D" parent="." unique_id=1168109315]
+position = Vector2(0, 16)
+sprite_frames = ExtResource("3_qlg0r")
+animation = &"idle"
+autoplay = "idle"
+frame_progress = 0.4148726
+offset = Vector2(0, -40)
 
-[node name="BodyShape" type="CollisionShape2D" parent="." unique_id=163052904]
-position = Vector2(0, -20)
-shape = SubResource("RectangleShape2D_dqkch")
-debug_color = Color(0, 0.31972465, 0.31743684, 0.41960785)
+[node name="BodyShape" type="CollisionShape2D" parent="." unique_id=1797449691]
+position = Vector2(0, -24)
+shape = SubResource("CapsuleShape2D_qhqgy")

@@ -48,6 +48,18 @@
   - 以后导入音频：音乐统一 OGG，短音效 WAV，禁止 WAV 用于长音乐
   - 以后配置 AudioBus：所有总线必须语义命名，禁用 Godot 默认 `New Bus N`
 
+- **场景**：开发 M2（重力与跳跃，2026-06-20）
+- **教训**：
+  - **跳跃判定可纯函数化**：`is_on_floor() && just_pressed` 这种依赖物理/Input 的判定，抽成 `should_jump(on_floor: bool, jump_pressed: bool) -> bool`（`return on_floor and jump_pressed`）纯函数，单测直接传布尔值覆盖 3 分支，绕开 headless 无法注入 Input/物理状态的难题（延续 M1「纯函数抽离提升可测性」经验）
+  - **变速跳跃最简洁实现**：`if Input.is_action_just_released(&"jump") and velocity.y < 0.0: velocity.y *= variable_jump_multiplier`——松键瞬间只裁剪上升阶段速度，一行实现可控高度，无需维护额外计时器
+  - **project.godot [input] 可手写文本新增 action**：[input] 段是 INI 配置非 .tscn/.tres 场景，不属宪法 §12.1「场景文件必须由工具生成」约束，可直接 Edit 文本新增 action；但**必须**在编辑器重载项目（Project → Reload Current Project）让 InputMap 重新加载生效
+  - **Input Action 绑定速查**：键盘用 `InputEventKey` + `physical_keycode`（Space=32，A=65，D=68，方向键左=4194319/右=4194321）；手柄按键用 `InputEventJoypadButton` + `button_index`（A=0 即 JOY_BUTTON_A），摇杆用 `InputEventJoypadMotion` + `axis`/`axis_value`
+  - **godot-ultimate MCP 路径前缀**：`godot_lint_file` 用 `scripts/player/player.gd`（无 res:// 前缀）能识别，`godot_validate_inputs` 对 `Input.get_axis(&"a",&"b")` 这类间接引用的 action 可能误报 unused（实际有用），需结合代码人工判断
+- **规则**：
+  - 以后做依赖物理状态/Input 的判定逻辑：尽量抽纯函数（入参传基本类型 bool/float），单测传参覆盖分支，集成验证靠玩家手工
+  - 以后加新 Input Action：直接 Edit `project.godot [input]` 文本（非场景文件，§12.1 不约束），改完提醒用户重载项目
+  - 以后写变速跳跃：固定用 `is_action_just_released + velocity.y < 0` 裁剪上升速度方案，简洁且足够
+
 ## 项目专属经验（brave-adventure）
 
 - **技术栈**：Godot 4.6 + Forward Plus + Jolt Physics + GdUnit4；视口 480×270，窗口 1920×1080，stretch=viewport

@@ -1,0 +1,44 @@
+[gd_resource type="Theme" format=3 uid="uid://tmgrr4aojue0"]
+
+[ext_resource type="FontFile" uid="uid://dx212dmpvbqn0" path="res://assets/fonts/SmileySans-Oblique.otf" id="1_3f3va"]
+[ext_resource type="StyleBox" uid="uid://j7k4kgr30c67" path="res://assets/themes/button_style_box_empty.tres" id="1_lxams"]
+[ext_resource type="StyleBox" uid="uid://rigler1k8bed" path="res://assets/themes/button_style_box_texture.tres" id="2_vhku8"]
+[ext_resource type="Texture2D" uid="uid://cydgbjunmwjko" path="res://assets/sprites/Legacy-Fantasy_High_Forest_2.3/HUD/Base-01.png" id="3_gvtt4"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gvtt4"]
+atlas = ExtResource("3_gvtt4")
+region = Rect2(3, 130, 11, 11)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_axncs"]
+atlas = ExtResource("3_gvtt4")
+region = Rect2(19, 130, 11, 11)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gvtt4"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_axncs"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vhku8"]
+texture = ExtResource("3_gvtt4")
+texture_margin_left = 3.0
+texture_margin_top = 4.0
+texture_margin_right = 3.0
+texture_margin_bottom = 4.0
+region_rect = Rect2(3, 130, 11, 11)
+
+[resource]
+default_font = ExtResource("1_3f3va")
+Button/colors/font_outline_color = Color(0, 0, 0, 1)
+Button/colors/font_pressed_color = Color(1, 1, 0.94509804, 1)
+Button/constants/outline_size = 6
+Button/styles/disabled = ExtResource("1_lxams")
+Button/styles/focus = ExtResource("2_vhku8")
+Button/styles/hover = ExtResource("1_lxams")
+Button/styles/normal = ExtResource("1_lxams")
+Button/styles/pressed = ExtResource("1_lxams")
+HSlider/icons/grabber = SubResource("AtlasTexture_gvtt4")
+HSlider/icons/grabber_highlight = SubResource("AtlasTexture_axncs")
+HSlider/styles/grabber_area = SubResource("StyleBoxEmpty_gvtt4")
+HSlider/styles/grabber_area_highlight = SubResource("StyleBoxEmpty_axncs")
+HSlider/styles/slider = SubResource("StyleBoxTexture_vhku8")
+Label/colors/font_shadow_color = Color(0, 0, 0, 0.4509804)
+PanelContainer/styles/panel = ExtResource("2_vhku8")

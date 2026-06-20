@@ -1,0 +1,21 @@
+[gd_resource type="TileSet" format=3 uid="uid://nmxfmvwa1bni"]
+
+[ext_resource type="Texture2D" uid="uid://dp2w22bk1rw1f" path="res://assets/sprites/Legacy-Fantasy_High_Forest_2.3/Assets/Tree-Assets.png" id="1_a5s5s"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_71j4m"]
+texture = ExtResource("1_a5s5s")
+6:3/0 = 0
+7:3/0 = 0
+8:3/0 = 0
+9:3/0 = 0
+8:2/0 = 0
+8:2/0/texture_origin = Vector2i(0, -3)
+9:2/0 = 0
+9:2/0/texture_origin = Vector2i(0, -1)
+10:2/size_in_atlas = Vector2i(1, 2)
+10:2/0 = 0
+10:2/0/texture_origin = Vector2i(0, 5)
+10:2/0/y_sort_origin = 8
+
+[resource]
+sources/0 = SubResource("TileSetAtlasSource_71j4m")

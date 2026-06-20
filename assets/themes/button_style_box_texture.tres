@@ -1,0 +1,17 @@
+[gd_resource type="StyleBoxTexture" format=3 uid="uid://rigler1k8bed"]
+
+[ext_resource type="Texture2D" uid="uid://cydgbjunmwjko" path="res://assets/sprites/Legacy-Fantasy_High_Forest_2.3/HUD/Base-01.png" id="1_t1fme"]
+
+[resource]
+content_margin_left = 16.0
+content_margin_top = 4.0
+content_margin_right = 16.0
+content_margin_bottom = 4.0
+texture = ExtResource("1_t1fme")
+texture_margin_left = 3.0
+texture_margin_top = 3.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+region_rect = Rect2(64, 272, 16, 16)

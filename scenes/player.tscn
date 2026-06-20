@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="1_g2els"]
+[ext_resource type="Resource" path="res://assets/resources/stats/player_stats.tres" id="2_qhqgy"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dqkch"]
+size = Vector2(32, 40)
+
+[node name="Player" type="CharacterBody2D" unique_id=660545596]
+collision_mask = 32
+script = ExtResource("1_g2els")
+stats = ExtResource("2_qhqgy")
+
+[node name="BodySprite" type="ColorRect" parent="." unique_id=1083344574]
+offset_left = -16.0
+offset_top = -40.0
+offset_right = 16.0
+color = Color(2.3102762e-06, 0.68186617, 0.61745065, 1)
+
+[node name="BodyShape" type="CollisionShape2D" parent="." unique_id=163052904]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_dqkch")
+debug_color = Color(0, 0.31972465, 0.31743684, 0.41960785)
